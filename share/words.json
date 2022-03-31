@@ -1,6 +1,4 @@
-{ need to change to fit our db
-    "published": 2022,
-    "author": "Jason Liu",
-    "title": "Project 2 - Two RESTFful Back End Microservice",
-    "first_sentence": "I did this all myself"
+{ 
+    "wordID": 2,        
+    "word": " "
 }

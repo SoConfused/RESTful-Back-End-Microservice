@@ -3,6 +3,7 @@ import logging.config
 import typing
 import contextlib
 import random
+import json
 
 from typing import Optional
 from xml.dom.minidom import CharacterData
@@ -36,23 +37,29 @@ def get_logger():
 app = FastAPI()
 settings = Settings()
 
-@app.get("/")
+'''@app.get("/")
 def read_root():
     return {"Hello": "World"}
 
-@app.get("/words/{wordid}")
+@app.get("/words/{word_id}")
 def read_words(word_id: int, word_str: Optional[str] = None):
-    return {"item_id": word_id, "word": word_str}
+    return {"item_id": word_id, "word": word_str}'''
 
-@app.get("/answers/{answerkey}")
-def get_answer_key(answer: str, db: sqlite3.Connection = Depends(get_db)):
+@app.get("/answers/{wotd_key}")
+def get_answer_key(wotd_key: int, wotd:str, db: sqlite3.Connection = Depends(get_db)):
     wotd_key = random.randrange(2308) # Get value for Word of the Day
-    return wotd_key
+    cur = db.execute("SELECT * FROM answers WHERE wotd_key = ? LIMIT 1", [wotd_key])
+    wotd = cur.fetchall()
+    if not wotd:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Word not found")
+    # need to access datab
+    return {"wotd": wotd}
     
 # The word validation service should expose the following operations:
 # Checking if a guess is a valid five-letter word
 # Adding and removing possible guesses   (lets focus with just words and just remove guesses user's made)
 
+@app.get("/words/{word}")
 def validate_word(word: str, db: sqlite3.Connection = Depends(get_db)):  # Check valid word
     cur = db.execute("SELECT * FROM words WHERE id = ? LIMIT 1", [word])
     words = cur.fetchall()
@@ -60,50 +67,68 @@ def validate_word(word: str, db: sqlite3.Connection = Depends(get_db)):  # Check
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Word not found"
         )
-    return {"words": words}
+    return {"words": words}     # might be dumb is this convereted to a json already? i think it is idk xd
 
 # The answer checking service should expose the following operations:
-# Checking a valid guess against the answer for the current day.
-# If the guess is incorrect, the response should identify the letters that are:
-# in the word and in the correct spot,
-# in the word but in the wrong spot, and
-# not in the word in any spot
+#   Checking a valid guess against the answer for the current day.
+#   If the guess is incorrect, the response should identify the letters that are:
+#   in the word and in the correct spot,
+#   in the word but in the wrong spot, and
+#   not in the word in any spot
+#   Changing the answers for future games.
+# Note: The answer checking service should not store the current day's answer on the server side
 
-# Changing the answers for future games.
-
+@app.get("/check_answer") # maybe app.post if we're putting dictionary into json
 def check_answer(word: str, answer: str, db: sqlite3.Connection = Depends(get_db)): # checks if word is the answer/compares the word to the answer
-    user_word = validate_word(word, db)  # valid word user inputs 
-    answer_key = get_answer_key(answer, db) #Returns WOTD key -> designate the "Answer"
-    answer_word = # access answers.db and get the actual word 
-    #Loop to see each character between user_word vs answer_word
-    # sepeerate user_word for ecah char use a single answer
-    '''my_string = "Python"
-    tokens = list(my_string)
-    print("String tokens are: ", tokens)
-    print(tokens[0])'''
     
-    for character in user_word:
-        for letter in answer_word:
-            if user_word[character] = answer_word[letter]: #green = 0 (right character right spot)
-                user_word[len(character) = answer_word[0] -> Green
-            if #yellow = 1 (right character wrong spot)
-                user_word[0] = answer_word[1] or user_word[0] = answer_word[2]  -> Yellow 
-            if # grey = 2 (wrong character)
-    
-    for character in answer_word:
-        if 
+    ######################## START 
+    user_word = validate_word(word, db)       # valid word user inputs 
+    answer_word = get_answer_key(answer, db)     # access answers.db and get the actual word 
+    word_color = { }                          # Empty dictionary
 
+    # Loops through the user_word and checks with the WOTD and assigning the correct color
+    for character, i in user_word:
+        if answer_word.find(character) == -1:
+            word_color[i]['color'] = 'Grey'
+        elif answer_word.find(character) == user_word.index(character):
+            word_color[i]['color'] = 'Green'
+        else:
+            word_color[i]['color'] = 'Yellow'
+
+    word_color_json = json.dumps(word_color, indent = 4) # converts from dict to json
+    return word_color_json                               # returns the 5 colors as a json
+    # there is no need to keep another dictionary like below with "guesses"
+
+    # Todo - put dictionary into json
+    ############################ END all we need i think
+
+
+
+
+
+    # we can keep below for funzies if what/when what i wrote above is actually not right :)
+
+    # '''my_string = "Python"
+    # tokens = list(my_string)
+    # print("String tokens are: ", tokens)
+    # print(tokens[0])'''
+    
+    # for character in user_word:
+    #     for letter in answer_word:
+    #         if user_word[character] = answer_word[letter]: #green = 0 (right character right spot)
+    #             user_word[len(character) = answer_word[0] -> Green
+    #         if #yellow = 1 (right character wrong spot)
+    #             user_word[0] = answer_word[1] or user_word[0] = answer_word[2]  -> Yellow 
+    #         if # grey = 2 (wrong character)
+    
+    # for character in answer_word:
+    #     if 
         
         #check if:
         #exists and in the correct spot
         #exists and in the wrong spot
         #does not exist in the word
-
-
 # for letter in answer word:
-#    
-
-
 # # Dictionary Built-in Functions
 # squares = {0: P, 1: A, 2: T, 3: T, 4: Y, 5: Y}
 
@@ -122,71 +147,20 @@ def check_answer(word: str, answer: str, db: sqlite3.Connection = Depends(get_db
 #           
 # }
 
-    # '''my_string = "Python"
-    # tokens = list(my_string)
-    # print("String tokens are: ", tokens)
-    # print(tokens[0])'''
-    
+# word[0]["letter"] = user_word[0]
+# word[1]["letter"] = user_word[1]
+# word[2]["letter"] = user_word[2]
+# word[3]["letter"] = user_word[3]
+# word[4]["letter"] = user_word[4]
 
-word[0]["letter"] = user_word[0]
-word[1]["letter"] = user_word[1]
-word[2]["letter"] = user_word[2]
-word[3]["letter"] = user_word[3]
-word[4]["letter"] = user_word[4]
-
-
-
-  for character , i = 0  in answer_word: #"Python" 
-        if word[i]["letter"] == character (P)  #grab p in first loop 
-            word[i]['color'] = 'Green'
-        else # word[i]["letter"] != character (P)  
-            if answer_word.find(word[i]["letter"]) > 0
-                word[i]['color'] = 'Yellow'
-            else 
-               word[i]['color'] = 'Grey'
-
-
-######################## START 
-    # user_word = validate_word(word, db)  # valid word user inputs 
-    # answer_key = get_answer_key(answer, db) #Returns WOTD key -> designate the "Answer"
-    # answer_word = # access answers.db and get the actual word 
-# word_color = { } // Empty dictionary
-
-#user word = poker
-#answer_word = python
-    for character in user_word
-        if answer_word.find(character) == -1
-            word_color[i]['color'] = 'Grey'
-        else if answer_word.find(character) == user_word.index(character)
-            word_color[i]['color'] = 'Green'
-        else
-            word_color[i]['color'] = 'Yellow'
-# todo: track number of greens (counter)
-# user_word = {
-#     0 : {
-#     "color": 'white' 
-#     },
-#     1 : {
-#     "color" : "white"
-#     },
-#     2 : {
-#     "color" : "white"
-#     },
-#     3 : {
-#     "color" : "white"
-#     },
-#     4 : {
-#     "color" : "white"
-#     },
-# }
-# return all the colors in order at the end
-# # actually we need to also do a quick check in the case if all are green and in that case we also return back like a "correct answer or soemthing idk"
-# since we dont care about making sure which are green after one guess or another
-# there is no need to keep another dictionary like below with "guesses"
-############################ END all we need i think
-
-
-
+#   for character , i = 0  in answer_word: #"Python" 
+#         if word[i]["letter"] == character (P)  #grab p in first loop 
+#             word[i]['color'] = 'Green'
+#         else # word[i]["letter"] != character (P)  
+#             if answer_word.find(word[i]["letter"]) > 0
+#                 word[i]['color'] = 'Yellow'
+#             else 
+#                word[i]['color'] = 'Grey'
 
 # # guesses = {
 # #          poker : {
@@ -207,11 +181,3 @@ word[4]["letter"] = user_word[4]
 #             ***O*: {letter: , color: }, {letter: , color: }}, {letter: , color: }, {letter: O, color: Green }, {r: }***O*: {letter: , color: }, {letter: , color: }}, {letter: , color: }, {letter: O, color: Green }, {r: }
 #             *O***: {letter: , color: }, {letter: O, color: }}, {letter: , color: }, {letter: O, color: Green }, {r: }
 #            }
-
-# Output : 'Empty'
-# print(myfamily[0]['color'])
-
-# word[0]['color'] = Yellow 
-
-# Output : 'Yellow'
-# print(myfamily[0]['color'])

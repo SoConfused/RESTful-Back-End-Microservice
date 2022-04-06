@@ -37,6 +37,8 @@ def get_logger():
 app = FastAPI()
 settings = Settings()
 
+logging.config.fileConfig(settings.logging_config)
+
 '''@app.get("/")
 def read_root():
     return {"Hello": "World"}

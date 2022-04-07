@@ -1,57 +1,37 @@
 import sqlite3
-import logging.config
-import typing
-import contextlib
 import random
-import json
 
-from typing import Optional
-from xml.dom.minidom import CharacterData
-from fastapi import FastAPI, Depends, Response, HTTPException, status
-from pydantic import BaseModel, BaseSettings
+# this function returns a random word from answers.db
+def get_wotd():
+    wotd_key = random.randrange(1,2309) 
+    database_file = 'answers.db'
+    database = sqlite3.connect(database_file)
+    cur = database.cursor()
+    cur.execute("SELECT * FROM answers WHERE answerID = ?", [wotd_key])
+    #print(cur.fetchall())
+    wotd = cur.fetchall()
+    return wotd
 
-# class Settings(BaseSettings):
-#     database: str
-#     logging_config: str
-
-#     class Config:
-#         env_file = ".env"
-
-
-# class words(BaseModel):
-#     wotd_key: int
-#     wotd: str
-
-# app = FastAPI()
-# settings = Settings()
-
-# logging.config.fileConfig(settings.logging_config)
-# cursor.execute("CREATE TABLE answers (answerID PRIMARY KEY, answer)")
-#database_file = 'answers.db'
-#database = sqlite3.connect(database_file)
+# this function creates wotd.db (word of the day database) 
+def createDB(wotd):
+    connection = sqlite3.connect("wotd.db")
+    cursor = connection.cursor()
+    cursor.execute("CREATE TABLE answers (answerID PRIMARY KEY, answer)")
+    cursor.executemany("INSERT INTO answers VALUES (?, ?)",wotd) 
+    connection.commit()  # adds all of answers.json into answers.db
 
 
-#def get_db():
-#    with contextlib.closing(sqlite3.connect(settings.database)) as db:
-#        db.row_factory = sqlite3.Row
-#        yield db
+if __name__ == '__main__':
+    wotd = get_wotd()
+    createDB (wotd)
 
-# @app.get("/answers/{wotd}")
-# def get_wotd():
-#     db = get_db()
-#     wotd_key = random.randrange(2308) # Get value for Word of the Day
-#     cur = db.execute("SELECT * FROM answers WHERE wotd_key = ? LIMIT 1", [wotd_key])
-#     wotd = cur.fetchall()
-#     if not wotd:
-#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Word not found")
-#     # need to access datab
-#     return {"wotd": wotd}
 
-database_file = 'answers.db'
-database = sqlite3.connect(database_file)
-cur = database.cursor()
-cur.execute("SELECT * FROM answers WHERE answerID = 5")
-print(cur.fetchall())
+# '''wotd_key = random.randrange(1,2309) 
+# database_file = 'answers.db'
+# database = sqlite3.connect(database_file)
+# cur = database.cursor()
+# cur.execute("SELECT * FROM answers WHERE answerID = ?", [wotd_key])
+# print(cur.fetchall())'''
 
 # if __name__ == '__main__':
 #     #answer = get_db()
@@ -64,4 +44,4 @@ print(cur.fetchall())
 #     print(cur.fetchall())
 
 
-database.close()
+#database.close()

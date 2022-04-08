@@ -24,14 +24,15 @@ class Game:
             else:
                 self.five = True
         return self.five
+        
 
     # this function checks to see if player's guess is a valid word
     #   that exists in answers.db (our database of valid words)
     def validate_word(self):
-        database_file = 'answers.db'
+        database_file = 'words.db'
         database = sqlite3.connect(database_file)
         cur = database.cursor()
-        cur.execute(("SELECT * FROM answers WHERE answer= ?"), [self.guess])       
+        cur.execute(("SELECT * FROM words WHERE word= ?"), [self.guess])       
         if cur.fetchone():  
             print("Found!")
             self.valid = True

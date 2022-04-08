@@ -26,3 +26,4 @@ def createDB(answers):
 if __name__ == '__main__':
     answers = fetch_answers()
     createDB (answers)
+

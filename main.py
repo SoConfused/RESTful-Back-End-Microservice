@@ -2,12 +2,15 @@ from validatingservice import *
 from checkingservice import *
 from wotd import *
 from answers import *
+from valid import *
 import sqlite3 
 import json
 import os
 
 if __name__ == '__main__':
     # TO DO: INITIALIZE WORDS DB HERE
+    wordList = word_list()
+    createDBforWords(wordList)
 
     # initialize answers db
     answers = fetch_answers()
@@ -27,8 +30,9 @@ if __name__ == '__main__':
             game1.five = False
             game1.valid = False
             
-            isFive = game1.check_five() # check if player's guess is a five lettered word
-            validWord = game1.validate_word() # check if player's guess is a valid word
+            while game1.valid == False:
+                isFive = game1.check_five() # check if player's guess is a five lettered word
+                validWord = game1.validate_word() # check if player's guess is a valid word
             
             # prints out the letter and color associated to each valid guess
             word_dict = color_answer()
@@ -47,5 +51,6 @@ if __name__ == '__main__':
     
     # end of game cleanup
     os.remove("answers.db") # deletes answers db
+    os.remove("words.db")   # deletes words db
 
     

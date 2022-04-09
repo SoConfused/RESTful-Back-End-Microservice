@@ -25,6 +25,6 @@ def createDBforAnswers(answers):
     connection.commit()  # adds all of answers.json into answers.db
 
 # USE FOLLOWING FOR TESTING answers.py
-# if __name__ == '__main__':
-#     answers = fetch_answers()
-#     createDB (answers)
+if __name__ == '__main__':
+    answers = fetch_answers()
+    print(answers)

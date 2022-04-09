@@ -13,24 +13,29 @@ def word_list():
      file = open("/usr/share/dict/words") # opens master list
      for line in file.readlines():
         lowerLine = line.lower() # change word in master list to lowercase
-        # currentWord = re.findall(r'\b(\w{6})\b', lowerLine)
+        # currentWord = re.findall(r'\b(\w{6})\b', lowerLinewordList)
         # eachWord = (wordID , currentWord)
         # listWords.append(eachWord)
         # wordID += 1
-        listWords += re.findall(r'\b(\w{6})\b', lowerLine)
-     print(listWords)
+        listWords += re.findall(r"\b([a-z']{5}$)\b", lowerLine)
+
+    #  print(listWords)
      return listWords
 
 
 # this function saves the final word list with all invalid words removed
 #   to answers.db database
-def createDBforWords(wordList):
+def createDBforWords(listWords):
     connection = sqlite3.connect("words.db")
     cursor = connection.cursor()
     cursor.execute("CREATE TABLE words (word)")
-    cursor.executemany("INSERT INTO words VALUES (?)",wordList) ######
+    for item in listWords:
+        cursor.execute("INSERT INTO words VALUES(?)", (item, )) ######
     connection.commit()  
     connection.close()
+
+    # for item in list_:
+    # c.execute("INSERT INTO server(sites) VALUES(?)", (item))
 
 # USE FOLLOWING FOR TESTING answers.py
 if __name__ == '__main__':

@@ -17,7 +17,7 @@ def word_list():
         # eachWord = (wordID , currentWord)
         # listWords.append(eachWord)
         # wordID += 1
-        listWords += re.findall(r"\b([a-z']{5}$)\b", lowerLine)
+        listWords += re.findall(r"\b([a-z]{5}$)\b", lowerLine)
 
     #  print(listWords)
      return listWords
@@ -30,20 +30,15 @@ def createDBforWords(listWords):
     cursor = connection.cursor()
     cursor.execute("CREATE TABLE words (word)")
     for item in listWords:
-        cursor.execute("INSERT INTO words VALUES(?)", (item, )) ######
+        cursor.execute("INSERT INTO words VALUES(?)", (item, )) 
     connection.commit()  
     connection.close()
 
     # for item in list_:
     # c.execute("INSERT INTO server(sites) VALUES(?)", (item))
 
-# USE FOLLOWING FOR TESTING answers.py
-if __name__ == '__main__':
-    os.remove("words.db")
-    wordList = word_list()
-    createDBforWords (wordList)
-
-
-
-
-
+# # USE FOLLOWING FOR TESTING answers.py
+# if __name__ == '__main__':
+#     os.remove("words.db")
+#     wordList = word_list()
+#     createDBforWords (wordList)

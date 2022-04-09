@@ -17,6 +17,7 @@ class Game:
 
     # this function checks to see if player's guess is a five lettered word
     def check_five(self):
+        self.five = False
         while(self.five == False):
             self.guess = self.set_guess()
             if (len(self.guess) != 5):
@@ -24,10 +25,9 @@ class Game:
             else:
                 self.five = True
         return self.five
-        
 
     # this function checks to see if player's guess is a valid word
-    #   that exists in answers.db (our database of valid words)
+    #   that exists in words.db (our database of valid words)
     def validate_word(self):
         database_file = 'words.db'
         database = sqlite3.connect(database_file)

@@ -41,7 +41,7 @@ class Game:
                 json.dump(self.guess, outfile)
                 outfile.write("\n")
         else:
-            print("Not a valid word, loser!")
+            print("Not a valid word!")
             self.valid = False
         return self.valid
 

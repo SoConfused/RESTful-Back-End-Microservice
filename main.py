@@ -1,56 +1,61 @@
-from validatingservice import *
-from checkingservice import *
-from wotd import *
-from answers import *
-from valid import *
-import sqlite3 
-import json
-import os
+from fastapi import FastAPI, Request, Form, Depends
+from fastapi.responses import HTMLResponse
+from pydantic import BaseModel, BaseSettings, Field
+import contextlib
+import logging.config
+import sqlite3
 
-if __name__ == '__main__':
-    # TO DO: INITIALIZE WORDS DB HERE
-    wordList = word_list()
-    createDBforWords(wordList)
 
-    # initialize answers db
-    answers = fetch_answers()
-    createDBforAnswers(answers)
+#Professor's code
+class Settings(BaseSettings):
+    database: str
+    logging_config: str
 
-    # start new game
-    user_input = 'y'
-    while (user_input.lower() == 'y'):
-        # initialize new word of the day for each new game
-        wotd = get_wotd()
-        createDB(wotd)
-        # new game object
-        game1 = Game("0", False, False, 6)
+    class Config:
+        env_file = ".env"
 
-        # let user guess words for six tries in a game
-        while game1.tries > 0: 
-            game1.five = False
-            game1.valid = False
-            
-            while game1.valid == False:
-                isFive = game1.check_five() # check if player's guess is a five lettered word
-                validWord = game1.validate_word() # check if player's guess is a valid word
-            
-            # prints out the letter and color associated to each valid guess
-            word_dict = color_answer()
-            for i in range(5):
-                print(word_dict[i]['letter'] , " " , word_dict[i]['color'])
-            
-            # if user answers correct word, end the game
-            if check_word() == True:
-                break
-        
-        # deletes current game's files for the next game
-        os.remove("guess.json")
-        os.remove("wotd.db")
-        print("play again? y/n")
-        user_input = input()
+class Words(BaseModel):
+    wordID: int
+    word: str
+
+def get_db():
+    with contextlib.closing(sqlite3.connect(settings.database)) as db:
+        db.row_factory = sqlite3.Row
+        yield db
+
+settings = Settings()
+app = FastAPI()
+
+logging.config.fileConfig(settings.logging_config)
+
+
+@app.get("/words/")
+def list_words(db: sqlite3.Connection = Depends(get_db)):
+    words = db.execute("SELECT * FROM words")
+    return {"words": words.fetchall()}
+
+#end professor's code
+
+
+'''
+app = FastAPI()
+# Example Hello World to get us started. This is localhost:8000/
+@app.get("/")
+async def root():
+    return {"message": "Hello World"}
+
+class Wotd(BaseModel):
+    wordID: int
+    word: str
     
-    # end of game cleanup
-    os.remove("answers.db") # deletes answers db
-    os.remove("words.db")   # deletes words db
 
-    
+
+
+#http://127.0.0.1:8000/docs
+#navigate your browser to http://localhost:8000/words/
+@app.get("/words/{word_ID}")
+async def create_item(word_ID: int, word: Wotd):
+    return {"word_ID": word_ID, **word.dict()}
+
+
+'''

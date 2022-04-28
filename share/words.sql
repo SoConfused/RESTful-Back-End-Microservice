@@ -1,4 +1,4 @@
-sqlite3 words.db < words.sql
+-- $ sqlite3 words.db < words.sql
 
 PRAGMA foreign_keys=ON;
 BEGIN TRANSACTION;

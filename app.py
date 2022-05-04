@@ -3,6 +3,7 @@ from checkingservice import *
 from wotd import *
 from answers import *
 from valid import *
+from winloss import *
 import sqlite3 
 import json
 import os
@@ -24,7 +25,7 @@ if __name__ == '__main__':
         wotd = get_wotd()
         createDB(wotd)
         # new game object
-        game1 = Game("0", False, False, 6)
+        game1 = Game("0", False, False, 6, 0)
 
         # let user guess words for six tries in a game
         while game1.tries > 0: 
@@ -42,8 +43,14 @@ if __name__ == '__main__':
             
             # if user answers correct word, end the game
             if check_word() == True:
+                #gamesWon will go here: gameWon += 1
                 break
-        
+
+            #Tracking.set_gamesPlayed(1)
+    # winloss.py stuff here   
+
+    # winPercentage = gameWon / gamesPlayed
+    
         # deletes current game's files for the next game
         os.remove("guess.json")
         os.remove("wotd.db")

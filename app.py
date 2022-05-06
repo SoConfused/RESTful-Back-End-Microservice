@@ -19,6 +19,8 @@ if __name__ == '__main__':
     createDBforAnswers(answers)
 
     # start new game
+    '''The client should supply a user ID and game ID when a game starts. 
+    If the user has already played the game, they should receive an error.'''
     user_input = 'y'
     while (user_input.lower() == 'y'):
         # initialize new word of the day for each new game
@@ -28,6 +30,8 @@ if __name__ == '__main__':
         game1 = Game("0", False, False, 6, 0)
 
         # let user guess words for six tries in a game
+        '''When a user makes a new guess for a game, record the guess and update the number of guesses remaining. 
+        If a user tries to guess more than six times, they should receive an error'''
         while game1.tries > 0: 
             game1.five = False
             game1.valid = False
@@ -54,11 +58,13 @@ if __name__ == '__main__':
         # deletes current game's files for the next game
         os.remove("guess.json")
         os.remove("wotd.db")
+
+        # ask to play again
+        '''upon request, the user should be able to retrieve an object containing the current state of a game, 
+        including the words guessed so far and the number of guesses remaining.'''
         print("play again? y/n")
         user_input = input()
     
     # end of game cleanup
     os.remove("answers.db") # deletes answers db
     os.remove("words.db")   # deletes words db
-
-    

@@ -23,7 +23,7 @@ YEAR = 2022
 
 random.seed(YEAR)
 fake = Faker()
-Faker.seed(YEAR)
+fake.seed(YEAR)
 
 with contextlib.closing(sqlite3.connect(DATABASE)) as db: #db = connection object
     cursor = db.cursor()    # cursor object

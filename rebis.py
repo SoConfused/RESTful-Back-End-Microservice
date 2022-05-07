@@ -45,17 +45,17 @@ temp3 = current3.fetchall()
 #grabbing top 10 from shard 1
 temp1 = current1.execute("SELECT user_id, won FROM games Order by won Desc Limit 10")
 temp1 = current1.fetchall()
-print(temp1)
+#print(temp1)
 
 #grabbing top 10 from shard 2
 temp2 = current2.execute("SELECT user_id, won FROM games Order by won Desc Limit 10")
 temp2 = current2.fetchall()
-print(temp2)
+#print(temp2)
 
 #grabbing top 10 from shard 3
 temp3 = current3.execute("SELECT user_id, won FROM games Order by won Desc Limit 10")
 temp3 = current3.fetchall()
-print(temp3)
+#print(temp3)
 
 with r.pipeline() as pipe:
     #desc=True -> Least to greatest, doesn't work

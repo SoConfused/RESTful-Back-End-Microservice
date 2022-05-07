@@ -3,12 +3,12 @@ import sqlite3
 import json
 
 class Game:
-    def __init__(self, guess, five, valid, tries, numGuesses):
+    def __init__(self, guess, five, valid, tries):
         self.guess = guess.lower()
         self.five = five
         self.valid = valid
         self.tries = tries
-        self.numGuesses = numGuesses
+
 
     # this function asks the player for their guess
     def set_guess(self):
@@ -27,8 +27,6 @@ class Game:
                 self.five = True
         return self.five
 
-    def get_numGuesses(self):
-        return self.numGuesses
 
     # this function checks to see if player's guess is a valid word
     #   that exists in words.db (our database of valid words)
@@ -41,7 +39,6 @@ class Game:
             print("Found!")
             self.valid = True
             self.tries -= 1
-            self.numGuesses += 1
             with open("guess.json", "a") as outfile:
                 json.dump(self.guess, outfile)
                 outfile.write("\n")

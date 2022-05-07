@@ -3,7 +3,6 @@ from checkingservice import *
 from wotd import *
 from answers import *
 from valid import *
-from winloss import *
 import sqlite3 
 import json
 import os
@@ -19,19 +18,15 @@ if __name__ == '__main__':
     createDBforAnswers(answers)
 
     # start new game
-    '''The client should supply a user ID and game ID when a game starts. 
-    If the user has already played the game, they should receive an error.'''
     user_input = 'y'
     while (user_input.lower() == 'y'):
         # initialize new word of the day for each new game
         wotd = get_wotd()
         createDB(wotd)
         # new game object
-        game1 = Game("0", False, False, 6, 0)
+        game1 = Game("0", False, False, 6)
 
         # let user guess words for six tries in a game
-        '''When a user makes a new guess for a game, record the guess and update the number of guesses remaining. 
-        If a user tries to guess more than six times, they should receive an error'''
         while game1.tries > 0: 
             game1.five = False
             game1.valid = False
@@ -47,21 +42,17 @@ if __name__ == '__main__':
             
             # if user answers correct word, end the game
             if check_word() == True:
-                #gamesWon will go here: gameWon += 1
                 break
 
-            #Tracking.set_gamesPlayed(1)
-    # winloss.py stuff here   
-
-    # winPercentage = gameWon / gamesPlayed
+            #Tracking.set_gamesPlayed(1) we got this?
+    
     
         # deletes current game's files for the next game
         os.remove("guess.json")
         os.remove("wotd.db")
 
         # ask to play again
-        '''upon request, the user should be able to retrieve an object containing the current state of a game, 
-        including the words guessed so far and the number of guesses remaining.'''
+        '''display leaderboard'''
         print("play again? y/n")
         user_input = input()
     

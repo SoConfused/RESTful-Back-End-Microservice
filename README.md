@@ -1,5 +1,5 @@
 # Woordle-Clone-Project
-In this project we will build two RESTful back-end microservices.
+In this project we will built RESTful back-end microservices.
 
 Yujin Chung - yujin.chung@csu.fullerton.edu
 
